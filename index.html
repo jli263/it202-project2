@@ -8,14 +8,26 @@
 	 crossorigin="anonymous">
 
 	<style>
+        #map {
+            height: 400px;  /* The height is 400 pixels */
+            width: 100%;  /* The width is the width of the web page */
+        }
 		.content {
 			display: none;
 			margin: 1em;
 		}
-        
+        .template {
+            display:none;
+        }
         #options{
             width:100px;  
             height:30px;
+        }
+        .Completed {
+            color: green;
+        }
+        .Open {
+            color:red;
         }
 	</style>
 
@@ -23,7 +35,7 @@
 
 <body>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<a class="navbar-brand" href="#">Graffiti Removal</a>
+		<a class="navbar-brand" href="#">Chicago Graffiti Removal</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
@@ -33,10 +45,10 @@
         <a class="nav-link" href="#home">Search <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#screen2">List</a>
+        <a class="nav-link" href="#list">List</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#screen3">Map</a>
+        <a class="nav-link" href="#map">Map</a>
       </li>
     </ul>
   </div>
@@ -44,30 +56,43 @@
   <div class="content" id="home">
     <form>
         Ward Number:            Ward Status:<br>
-        <input type = "text" value = "Enter a ward" >
+        <input type = "text" id = "ward" placeholder = "Enter a ward" >
         <select name = "status" id = "options">
             <option name = "None"></option>
             <option name = "Open">Open</option>
             <option name = "Completed">Completed</option>
         </select> <br><br>
-        <input type = "submit" value = "submit" id = "submitted">
+        <input type = "button" value = "submit" id = "submitted">
     </form>
   </div>
-  <div class="content" id="screen2">
-    List
+  <div class="content" id="list">
+    Search in order to see results in a list
   </div>
-  <div class="content" id="screen3">
+  <div class="content" id="map">
     Map
   </div>
 
+    <div class="card template" style="width: 20rem;">
+		<div class="card-body">
+			<h5 class="card-title">Address of graffiti</h5>
+			<h6 class="requestNumber mb-2 text-muted">Service request number</h6>
+            <h6 class="graffitiLocation mb-2 text-muted">Location of the graffiti</h6>
+            <h6 class="typeOfSurface mb-2 text-muted">Type of surface</h6>
+            <h6 class="dateCreated mb-2 text-muted">Date created</h6>
+            <h6 class="completionStatus mb-2 text-muted">Completion Status</h6>
+            <h6 class="completionDate mb-2 text-muted">Completion Date</h6>
+			<a href="#map" class="card-link">Show on map</a>
+		</div>
+	</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-      
-
+  
     <script>
       $(document).ready(function() {
-
+          
+        $("#home").show();
+          
         function hideScreens() {
           $(".content").hide();
         }
@@ -78,12 +103,74 @@
           $(target).show();
         });
 
+          
+        var url = "https://data.cityofchicago.org/resource/cdmx-wzbz.json?$limit=20"
+          
+        $("#submitted").on("click", function(){
+            
+            //Clear list and map
+            $("#list").empty();
+            $("#map").empty();
+            
+            var option = $("#options").val();
+            console.log($("#ward").val());
+            
+            //Obtain the URL with user request
+            if (option == "Completed" || option == "Open") {
+                var alteredURL = url + "&ward=" + $("#ward").val() + "&status=" + option;
+            }else {
+                var alteredURL = url + "&ward=" + $("#ward").val();
+            }
+            console.log(alteredURL); 
+            
+            $.get(alteredURL, function(response) {
+                
+                var returnVals = "<h5> Your query returned " + 
+                       response.length + " records.<h5>";
+                
+                //Show the user the amount of records found
+                $("#home").append(returnVals);
+                
+                var data = response;
+                
+                $.each(data, function(i,j) { 
+                    
+                    var clone = $(".template").clone();
+                    
+                    clone.find(".card-title").text(j.street_address);
+                    clone.find(".card-title").addClass(j.status);
+                    clone.find(".requestNumber").text("Service request number " + j.service_request_number);
+                    clone.find(".graffitiLocation").text("Graffiti location: " + j.where_is_the_graffiti_located_);
+                    clone.find(".typeOfSurface").text("Type of surface: " + j.what_type_of_surface_is_the_graffiti_on_);
+                    clone.find(".dateCreated").text("Date created: " + j.creation_date);
+                    clone.find(".completionStatus").text("Completion Status: " + j.status);
+                    
+                    if(j.status == "Completed") {
+                        clone.find(".completionDate").text("Date completed: " + j.completion_date);
+                    }else {
+                        clone.find(".completionDate").text("");   
+                    }
+                    
+                    clone.removeClass("template")
+                    
+                    $("#list").append(clone);
+                });
+                
+            });
+            
+            
+        });
+          
       });
     </script>
 
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDa4dMSOASs_iLQnhrPoQ8EZgj2Im_pZ7o&callback=initMap">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+	 crossorigin="anonymous"></script>
+
+     <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwwVvH6VHUYqkWnCM78PNwXhrZvhJo4qg&callback=initMap">
     </script>
+
 
   </body>
 </html>
