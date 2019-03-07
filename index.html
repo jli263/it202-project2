@@ -9,8 +9,9 @@
 
 	<style>
         #map {
-            height: 400px;  /* The height is 400 pixels */
+            height: 500px;  /* The height is 400 pixels */
             width: 100%;  /* The width is the width of the web page */
+            text-align: center;
         }
 		.content {
 			display: none;
@@ -69,7 +70,6 @@
     Search in order to see results in a list
   </div>
   <div class="content" id="map">
-    Map
   </div>
 
     <div class="card template" style="width: 20rem;">
@@ -87,9 +87,16 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  
+
     <script>
+        
       $(document).ready(function() {
+          
+           //Create the map
+      function initMap() {     
+        var chicago = {lat: 41.8781, lng: -87.6298};
+        var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: chicago});
+      }
           
         $("#home").show();
           
@@ -102,7 +109,6 @@
           var target = $(this).attr("href");
           $(target).show();
         });
-
           
         var url = "https://data.cityofchicago.org/resource/cdmx-wzbz.json?$limit=20"
           
@@ -167,10 +173,9 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
 	 crossorigin="anonymous"></script>
 
-     <script async defer
+    <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwwVvH6VHUYqkWnCM78PNwXhrZvhJo4qg&callback=initMap">
     </script>
-
 
   </body>
 </html>
