@@ -91,7 +91,6 @@
             <h6 class="dateCreated mb-2 text-muted">Date created</h6>
             <h6 class="completionStatus mb-2 text-muted">Completion Status</h6>
             <h6 class="completionDate mb-2 text-muted">Completion Date</h6>
-			<a href="#map" class="card-link">Show on map</a>
 		</div>
 	</div>
 
@@ -114,7 +113,7 @@
           $(target).show();
         });
         
-        var url = "https://data.cityofchicago.org/resource/cdmx-wzbz.json?$limit=20"
+        var url = "https://data.cityofchicago.org/resource/cdmx-wzbz.json"
           
         $("#submitted").on("click", function(){
             
@@ -131,9 +130,9 @@
             
             //Obtain the URL with user request
             if (option == "Completed" || option == "Open") {
-                var alteredURL = url + "&ward=" + $("#ward").val() + "&status=" + option;
+                var alteredURL = url + "?&ward=" + $("#ward").val() + "&status=" + option;
             }else {
-                var alteredURL = url + "&ward=" + $("#ward").val();
+                var alteredURL = url + "?&ward=" + $("#ward").val();
             }
             console.log(alteredURL); 
             
@@ -143,7 +142,7 @@
                        response.length + " records.<h5>";
                 
                 //Show the user the amount of records found
-                $("#home").append(returnVals);
+                $("#list").append(returnVals);
                 
                 var data = response;
                 
@@ -201,6 +200,15 @@
         });
           
       });
+    </script>
+    
+    <script>
+        // register the service worker for offline use
+        if('serviceWorker' in navigator) {
+          navigator.serviceWorker
+                   .register('./sw.js')
+                   .then(function() { console.log("Service Worker Registered"); });
+        }
     </script>
 
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
