@@ -115,7 +115,7 @@
             
             //Create the map
             var chicago = {lat: 41.8781, lng: -87.6298};
-            var map = new google.maps.Map(document.getElementById('map'), {zoom: 12, center: chicago});  
+            var map = new google.maps.Map(document.getElementById('map'), {zoom: 11, center: chicago});  
             
             var option = $("#options").val();
             console.log($("#ward").val());
@@ -159,8 +159,29 @@
                     
                     //set markers on the map
                     var location = {lat: parseFloat(j.location.coordinates[1]), lng: parseFloat(j.location.coordinates[0])};
-                    var marker = new google.maps.Marker({position: location, map: map});
-                    console.log(marker);
+                    
+                    var contentString = j.street_address + "<br><br>Service request number " + j.service_request_number + "<br>Graffiti location: "
+                            + j.where_is_the_graffiti_located_ + "<br>Type of surface: " + j.what_type_of_surface_is_the_graffiti_on_ +
+                            "<br>Date created: " + j.creation_date + "<br>Completion Status: " + j.status;
+                    
+                    if (j.status == "Completed") {
+                        var marker = new google.maps.Marker({position: location, map: map, icon: "http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png"});
+                        var infowindow = new google.maps.InfoWindow({
+                            content: contentString + "<br>Date completed: " + j.completion_date
+                        });               
+                    }else {
+                        var marker = new google.maps.Marker({position: location, map: map, icon: "http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png"});
+                        var infowindow = new google.maps.InfoWindow({
+                            content: contentString
+                        });
+                    }
+                    
+                   marker.addListener('click', function() {
+                       infowindow.open(map, marker);
+                   });
+
+                    
+                    
                     
                     clone.removeClass("template")
                     
